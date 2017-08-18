@@ -23,7 +23,7 @@
   (spec/and keyword? (partial = :bindings)))
 
 (spec/def ::binding-cell
-  (spec/tuple symbol? any?))
+  (spec/tuple (spec/or :symbol symbol? :destructure (spec/tuple symbol? symbol?)) any?))
 
 (spec/def ::loop-tpl
   (spec/cat :bindings-kw ::bindings-kw :bindings ::binding-cell :forms ::forms))
