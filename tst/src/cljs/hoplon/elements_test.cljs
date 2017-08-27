@@ -1,5 +1,6 @@
 (ns hoplon.elements-test
  (:require
+  goog.dom
   [hoplon.core :as h]
   [cljs.test :refer-macros [deftest is]]))
 
@@ -121,7 +122,9 @@
 
 (deftest ??elements
  (doseq [[f s] elements]
-  (is (.webkitMatchesSelector (f) s) (str "Element did not match selector: " s))))
+  (let [el (f)]
+   (is (goog.dom/isElement el))
+   (is (.webkitMatchesSelector el s) (str "Element did not match selector: " s)))))
 
 (deftest ??element-creation
  ; we want to handle at least as many children as the arity of invoke!
@@ -131,4 +134,26 @@
    [(h/div)]))
 
  ; we want to handle an arbitrary number of children
- (apply h/div (take 22 (repeatedly h/div))))
+ (apply
+  h/div
+  (take
+   (+ 22 (rand-int 20))
+   (repeatedly h/div))))
+
+(deftest ??element-attributes
+ (let [el-fn (first (rand-nth elements))]
+  ; simply adding "data-foo" as an attribute
+  (doseq [e [(el-fn #{:data-foo})
+             (el-fn :data-foo true)
+             (el-fn {:data-foo true})]]
+   (is (.webkitMatchesSelector e "[data-foo=\"data-foo\"]")))
+
+  ; setting a specific cljs value (such as a keyword) for "data-foo"
+  (doseq [e [(el-fn :data-foo :data-foo)
+             (el-fn {:data-foo :data-foo})]]
+   (is (.webkitMatchesSelector e "[data-foo=\":data-foo\"]")))
+  ; ability to set "true" is important for some HTML APIs, e.g. "draggable" for
+  ; HTML5 drag and drop.
+  (is (.webkitMatchesSelector
+       (el-fn {:data-foo "true"})
+       "[data-foo=\"true\"]"))))
