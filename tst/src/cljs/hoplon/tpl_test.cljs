@@ -19,10 +19,10 @@
 
 (deftest ??for-tpl
  (let [find-text (fn [el]
-                   (map
-                    #(.-textContent %)
-                    (array-seq
-                     (.querySelectorAll el "div"))))]
+                  (map
+                   #(.-textContent %)
+                   (array-seq
+                    (.querySelectorAll el "div"))))]
   ; the most common use-case is a sequence in a cell
   (let [c (j/cell [1 2 3])
         el (h/div
@@ -53,4 +53,18 @@
         (find-text
          (h/div
           (h/for-tpl [v (j/cell= (seq c))]
-           (h/div v)))))))))
+           (h/div v)))))))
+
+  ; we need to handle dynamic length cells
+  (let [c (j/cell ["1" "2" "3"])
+        el (h/div
+            (h/for-tpl [n c]
+             (h/div n)))]
+   (is (= ["1" "2" "3"]
+        (find-text el)))
+   (reset! c ["1" "2"])
+   (is (= ["1" "2"]
+        (find-text el)))
+   (reset! c ["1" "2" "4" "5"])
+   (is (= ["1" "2" "4" "5"]
+        (find-text el))))))
