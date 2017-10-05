@@ -8,7 +8,7 @@
                            [lein-doo                              "0.1.7"    :scope "test"]
                            [crisptrutski/boot-cljs-test           "0.3.3"    :scope "test"]
                            [org.clojure/clojure                   ~(clojure-version)]
-                           [org.clojure/clojurescript             "1.9.908"]
+                           [org.clojure/clojurescript             "1.9.946"]
                            [org.clojure/test.check                "0.9.0"]
                            [cljsjs/jquery                         "3.2.1-0"]
                            [hoplon/javelin                        "3.9.0"]]))
@@ -38,7 +38,8 @@
   (apply t :cljs-opts test-cljs-options xs)))
 
 (deftask develop-tests []
-  (comp (watch) (speak) (test-cljs :cljs-opts test-cljs-options)))
+ (set-env! :source-paths #{"tst/src/cljs"})
+ (comp (watch) (speak) (test-cljs :cljs-opts test-cljs-options)))
 
 (task-options!
   pom    {:project     'hoplon
